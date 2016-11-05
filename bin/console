@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "extratorrent_search"
+require 'factory_girl'
+
+include FactoryGirl::Syntax::Methods
+FactoryGirl.find_definitions
+
+# search = build :search, search: 'silicon valley s03e08'
+test = 1
+
+require "pry"
+Pry.start
