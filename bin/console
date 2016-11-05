@@ -1,14 +1,15 @@
 #!/usr/bin/env ruby
 
-require "bundler/setup"
-require "extratorrent_search"
+require 'bundler/setup'
+require 'extratorrent_search'
 require 'factory_girl'
 
 include FactoryGirl::Syntax::Methods
 FactoryGirl.find_definitions
 
 # search = build :search, search: 'silicon valley s03e08'
-test = 1
+search = build :search
+search_failed = build :search_failed
 
-require "pry"
+require 'pry'
 Pry.start

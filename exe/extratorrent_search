@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby -w
+lib = File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
+require 'extratorrent_search'
+require 'fileutils'
+require 'highline'
+require 'optparse'
+
+options = {
+  path: './'
+}
+
+optparse = OptionParser.new do |opts|
+  opts.banner = 'Usage: extratorrent_search [options] <search>'
+
+  opts.on('-y', '--auto-download', 'Auto-select first link') do
+    options[:auto] = true
+  end
+
+  opts.on('-v', '--version', 'Print version and exit') do
+    puts "extratorrent_search v#{ExtratorrentSearch::VERSION}"
+    exit
+  end
+
+  opts.on_tail('-h', '--help', 'Show this message') do
+    puts opts
+    exit
+  end
+end.parse!
+
+# Join arguments to create the search term
+options[:search] = optparse.join(' ')
+
+# main program
+begin
+  cli = HighLine.new
+  HighLine.colorize_strings # Monkey patch String for cli colors
+
+  # Valid search?
+  if options[:search].empty?
+    cli.say 'Please type a search'.red
+    exit
+  end
+
+  # Search subtitle
+  search = ExtratorrentSearch::Search.new(options[:search])
+
+  # Results found?
+  unless search.results_found?
+    cli.say 'No results found'.red
+    exit
+  end
+
+  # Choose
+  if options[:auto]
+    torrent = search.links.first
+  else
+    cli.say "Search results for #{options[:search]}:"
+    torrent = cli.choose(*search.links) do |menu|
+      menu.default = '1'
+      menu.select_by = :index
+    end
+  end
+
+  # Print magnet link for selected file
+  cli.say torrent.magnet
+rescue Interrupt, EOFError
+  cli.say 'Interrupted!'.red
+rescue SocketError
+  cli.say "Couldn't perform action. Are you online?".red
+end
