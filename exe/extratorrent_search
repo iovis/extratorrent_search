@@ -64,7 +64,7 @@ begin
   end
 
   # Print magnet link for selected file
-  cli.say torrent.magnet
+  cli.say torrent.magnet_link
 rescue Interrupt, EOFError
   cli.say 'Interrupted!'.red
 rescue SocketError
